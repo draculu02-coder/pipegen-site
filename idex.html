@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Jenkinsfast — Jenkinsfile за 10 минут</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-gray-50 text-gray-800">
+    <!-- Hero -->
+    <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700 text-white">
+      <div class="max-w-4xl mx-auto text-center px-6">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6">
+          Jenkinsfile за 10 минут
+        </h1>
+        <p class="text-xl md:text-2xl mb-10 opacity-90">
+          Больше никогда не пиши CI/CD руками.<br/>Готовый пайплайн под React, Node, Go, Docker и любой деплой.
+        </p>
+
+        <button onclick="openModal()" class="bg-white text-blue-600 px-10 py-5 rounded-xl text-xl font-bold hover:bg-gray-100 transform hover:scale-105 transition">
+          Сгенерировать первый Jenkinsfile бесплатно
+        </button>
+
+        <p class="mt-6 text-sm opacity-80">7 дней триала • Без карты</p>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="py-20 bg-white">
+      <div class="max-w-5xl mx-auto px-6 text-center">
+        <h2 class="text-4xl font-bold mb-12">Простые тарифы</h2>
+        <div class="grid md:grid-cols-2 gap-10 max-w-3xl mx-auto">
+
+          <!-- Starter -->
+          <div class="border-2 border-gray-200 rounded-2xl p-8 hover:border-blue-500 transition">
+            <h3 class="text-2xl font-bold">Starter</h3>
+            <p class="text-5xl font-bold my-4">$29<span class="text-lg font-normal">/мес</span></p>
+            <ul class="text-left space-y-3 mb-8">
+              <li>✓ 5 генераций в месяц</li>
+              <li>✓ Все шаги и шаблоны</li>
+              <li>✓ Обновления навсегда</li>
+              <li>✓ Поддержка 24 ч</li>
+            </ul>
+            <a href="https://buy.stripe.com/test_XXXXXXXXXXXXXXXXXXXXXX" 
+               class="block bg-gray-100 text-gray-800 py-4 rounded-lg font-bold hover:bg-gray-200">
+               Начать триал
+            </a>
+          </div>
+
+          <!-- Individual (популярный) -->
+          <div class="border-4 border-blue-500 rounded-2xl p-8 relative transform scale-105">
+            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+              ПОПУЛЯРНЫЙ
+            </div>
+            <h3 class="text-2xl font-bold">Individual</h3>
+            <p class="text-5xl font-bold my-4">$39<span class="text-lg font-normal">/мес</span></p>
+            <ul class="text-left space-y-3 mb-8">
+              <li>✓ 10 генераций в месяц</li>
+              <li>✓ Всё из Starter</li>
+              <li>✓ До 3 проектов одновременно</li>
+              <li>✓ Приоритетные обновления</li>
+            </ul>
+            <a href="https://buy.stripe.com/test_YYYYYYYYYYYYYYYYYYYYYY" 
+               class="block bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700">
+               Начать триал за $39
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 px-4">
+      <div class="bg-white rounded-2xl max-w-4xl w-full max-h-screen overflow-y-auto p-8 relative">
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
+        
+        <h3 class="text-3xl font-bold mb-6">Твой Jenkinsfile готов!</h3>
+        <p class="mb-6">Опиши свой проект (пример: “React → S3 + CloudFront, три окружения”):</p>
+        
+        <textarea id="userInput" class="w-full p-4 border rounded-lg mb-6" rows="3" placeholder="Напиши сюда свой стек и куда деплоишь..."></textarea>
+        
+        <button onclick="generate()" class="bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700">
+          Сгенерировать Jenkinsfile
+        </button>
+
+        <pre id="result" class="mt-8 bg-gray-900 text-green-400 p-6 rounded-lg overflow-x-auto hidden"><code id="code"></code></pre>
+        
+        <div id="after" class="mt-8 hidden text-center">
+          <p class="text-xl mb-6">Хочешь генерировать неограниченно под любой проект?</p>
+          <a href="https://buy.stripe.com/test_YYYYYYYYYYYYYYYYYYYYYY" class="inline-block bg-blue-600 text-white px-10 py-4 rounded-lg text-xl font-bold hover:bg-blue-700">
+            Начать за $39/мес → 7 дней бесплатно
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+      function closeModal() { document.getElementById('modal').classList.add('hidden'); document.getElementById('result').classList.add('hidden'); document.getElementById('after').classList.add('hidden'); }
+
+      function generate() {
+        const input = document.getElementById('userInput').value.toLowerCase();
+        let pipeline = "";
+
+        if (input.includes("react") || input.includes("frontend")) {
+          pipeline = `pipeline {
+    agent any
+    environment {
+        APP_NAME = "my-react-app"
+        S3_BUCKET = "dev-\${APP_NAME}"
+        CF_DISTRO = credentials("cloudfront-distro-id")
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'npm ci && npm run build'
+            }
+        }
+        stage('Deploy dev') {
+            when { branch 'main' }
+            steps {
+                sh 'aws s3 sync dist/ s3://\${S3_BUCKET}-dev --delete'
+                sh 'aws cloudfront create-invalidation --distribution-id \${CF_DISTRO} --paths "/*"'
+            }
+        }
+        // stage и prod добавятся автоматически в полном тарифе
+    }
+}`;
+        } else {
+          pipeline = `pipeline {
+    agent any
+    stages {
+        stage('Checkout') { steps { checkout scm } }
+        stage('Build') { steps { sh 'make build' } }
+        stage('Test') { steps { sh 'make test' } }
+        stage('Deploy dev') {
+            when { branch 'main' }
+            steps { echo 'Деплой в dev...' }
+        }
+    }
+}`;
+        }
+
+        document.getElementById('code').textContent = pipeline;
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('after').classList.remove('hidden');
+      }
+    </script>
+  </body>
+</html>
